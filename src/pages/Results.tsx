@@ -153,11 +153,10 @@ const Results: React.FC = () => {
     return '🚀';
   };
 
-  const openGoogleMaps = (mode: string) => {
-    const travelMode = mode.toLowerCase().includes('metro') ? 'transit' : 
-                       mode.toLowerCase().includes('bike') ? 'driving' : 
-                       'driving';
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(source)}&destination=${encodeURIComponent(destination)}&travelmode=${travelMode}`;
+  const openGoogleMaps = () => {
+    // Format: replace spaces with + for cleaner URL
+    const formatLocation = (loc: string) => loc.replace(/\s+/g, '+');
+    const url = `https://www.google.com/maps/dir/${formatLocation(source)}/${formatLocation(destination)}`;
     window.open(url, '_blank');
   };
 
@@ -252,7 +251,7 @@ const Results: React.FC = () => {
               variant="hero" 
               size="lg" 
               className="w-full"
-              onClick={() => openGoogleMaps(data.mvpOption.mode)}
+              onClick={() => openGoogleMaps()}
             >
               Open in Google Maps
               <ExternalLink className="w-4 h-4" />
@@ -314,7 +313,7 @@ const Results: React.FC = () => {
                 className="w-full"
                 onClick={() => {
                   setSelectedAlternative(index);
-                  openGoogleMaps(alt.mode);
+                  openGoogleMaps();
                 }}
               >
                 Choose this
