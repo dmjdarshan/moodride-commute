@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { source, destination, preferredMode, priority, extraNotes, persona } = await req.json();
+    const { source, destination, preferredMode, priority, extraNotes, persona, email } = await req.json();
     
     const MAKE_AGENT_WEBHOOK = Deno.env.get('MAKE_AGENT_WEBHOOK');
     const MAKE_API_KEY = Deno.env.get('MAKE_API_KEY');
@@ -78,6 +78,7 @@ serve(async (req) => {
     }
 
     console.log('Sending to Make.com webhook:', inputPrompt);
+    console.log('Email settings:', email);
 
     const response = await fetch(MAKE_AGENT_WEBHOOK, {
       method: 'POST',
@@ -86,7 +87,11 @@ serve(async (req) => {
         'x-make-apikey': MAKE_API_KEY,
       },
       body: JSON.stringify({
-        input: inputPrompt
+        input: inputPrompt,
+        email: {
+          send: email?.send || false,
+          address: email?.address || ''
+        }
       }),
     });
 
