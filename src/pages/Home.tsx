@@ -7,6 +7,8 @@ import LocationAutocomplete from '@/components/LocationAutocomplete';
 import SettingsModal from '@/components/SettingsModal';
 import { useApp } from '@/contexts/AppContext';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 type Priority = 'ontime' | 'budget' | 'convenience';
 type TransportMode = 'bike' | 'car' | 'metro' | 'cab' | 'any';
@@ -14,6 +16,7 @@ type TransportMode = 'bike' | 'car' | 'metro' | 'cab' | 'any';
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useApp();
+  const { toast } = useToast();
   const [showSettings, setShowSettings] = useState(false);
   
   // Form state
@@ -38,20 +41,61 @@ const Home: React.FC = () => {
     
     setIsLoading(true);
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 2500));
-    
-    // Navigate to results with state
-    navigate('/results', {
-      state: {
-        source,
-        destination,
-        preferredMode,
-        priority,
-        extraNotes,
-        persona: currentUser?.persona
+    try {
+      const { data, error } = await supabase.functions.invoke('decide-commute', {
+        body: {
+          source,
+          destination,
+          preferredMode,
+          priority,
+          extraNotes,
+          persona: currentUser?.persona
+        }
+      });
+
+      if (error) {
+        console.error('Edge function error:', error);
+        toast({
+          title: "API Error",
+          description: "Failed to get commute recommendations. Using offline mode.",
+          variant: "destructive"
+        });
       }
-    });
+
+      // Navigate to results with API response data
+      navigate('/results', {
+        state: {
+          source,
+          destination,
+          preferredMode,
+          priority,
+          extraNotes,
+          persona: currentUser?.persona,
+          apiResponse: data
+        }
+      });
+    } catch (err) {
+      console.error('Error calling decide-commute:', err);
+      toast({
+        title: "Connection Error",
+        description: "Could not reach the server. Using offline mode.",
+        variant: "destructive"
+      });
+      
+      // Navigate with no API response (will use dummy data)
+      navigate('/results', {
+        state: {
+          source,
+          destination,
+          preferredMode,
+          priority,
+          extraNotes,
+          persona: currentUser?.persona
+        }
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getModeOptions = () => {
