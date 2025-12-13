@@ -8,8 +8,17 @@ interface RouteOption {
   mode: string;
   time: string;
   cost: string;
-  stressLevel: 'Low' | 'Medium' | 'High';
+  stressLevel: string;
   reasoning: string;
+}
+
+interface ApiOutputItem {
+  mode: string;
+  time: string;
+  cost: string;
+  reasoning: string;
+  stress: number;
+  mvp: boolean;
 }
 
 interface ApiResponse {
@@ -58,16 +67,51 @@ const Results: React.FC = () => {
       return;
     }
 
+    // Convert stress number (0-10) to stress level string
+    const getStressLevelFromNumber = (stress: number): string => {
+      if (stress <= 3) return 'Low';
+      if (stress <= 6) return 'Medium';
+      return 'High';
+    };
+
+    // Parse the new API format: { output: [{ mode, time, cost, reasoning, stress, mvp }] }
+    const parseApiResponse = (response: any): ApiResponse => {
+      if (response.output && Array.isArray(response.output)) {
+        const items: ApiOutputItem[] = response.output;
+        const mvpItem = items.find(item => item.mvp === true) || items[0];
+        const alternativeItems = items.filter(item => item !== mvpItem);
+
+        return {
+          mvpOption: {
+            mode: mvpItem.mode,
+            time: mvpItem.time,
+            cost: mvpItem.cost,
+            reasoning: mvpItem.reasoning,
+            stressLevel: getStressLevelFromNumber(mvpItem.stress)
+          },
+          alternatives: alternativeItems.map(item => ({
+            mode: item.mode,
+            time: item.time,
+            cost: item.cost,
+            reasoning: item.reasoning,
+            stressLevel: getStressLevelFromNumber(item.stress)
+          }))
+        };
+      }
+      
+      // Fallback to old format or dummy
+      return {
+        mvpOption: response.mvpOption || DUMMY_RESPONSE.mvpOption,
+        alternatives: response.alternatives || DUMMY_RESPONSE.alternatives
+      };
+    };
+
     // Use API response if available, otherwise use dummy data
     if (apiResponse) {
       if (apiResponse.fallback || apiResponse.error) {
         setIsOffline(true);
       }
-      // Handle both direct response and nested structure
-      const responseData: ApiResponse = {
-        mvpOption: apiResponse.mvpOption || DUMMY_RESPONSE.mvpOption,
-        alternatives: apiResponse.alternatives || DUMMY_RESPONSE.alternatives
-      };
+      const responseData = parseApiResponse(apiResponse);
       setData(responseData);
     } else {
       setIsOffline(true);
