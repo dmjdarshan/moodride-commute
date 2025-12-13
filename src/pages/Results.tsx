@@ -154,8 +154,11 @@ const Results: React.FC = () => {
   };
 
   const openGoogleMaps = () => {
-    // Format: replace spaces with + for cleaner URL
-    const formatLocation = (loc: string) => loc.replace(/\s+/g, '+');
+    // Format: replace spaces with + and append Bengaluru, Karnataka for proper location
+    const formatLocation = (loc: string) => {
+      const fullLocation = `${loc}, Bengaluru, Karnataka`;
+      return fullLocation.replace(/\s+/g, '+');
+    };
     const url = `https://www.google.com/maps/dir/${formatLocation(source)}/${formatLocation(destination)}`;
     window.open(url, '_blank');
   };
