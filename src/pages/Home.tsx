@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Settings, Navigation, Loader2, Train, Bike, Car, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import SettingsModal from '@/components/SettingsModal';
 import { useApp } from '@/contexts/AppContext';
@@ -25,6 +26,7 @@ const Home: React.FC = () => {
   const [preferredMode, setPreferredMode] = useState<TransportMode>('any');
   const [priority, setPriority] = useState<Priority>('ontime');
   const [extraNotes, setExtraNotes] = useState('');
+  const [sendEmail, setSendEmail] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -49,7 +51,11 @@ const Home: React.FC = () => {
           preferredMode,
           priority,
           extraNotes,
-          persona: currentUser?.persona
+          persona: currentUser?.persona,
+          email: {
+            send: sendEmail,
+            address: currentUser?.email || ''
+          }
         }
       });
 
@@ -240,6 +246,21 @@ const Home: React.FC = () => {
             <p className="text-xs text-muted-foreground text-right">
               {extraNotes.length}/200
             </p>
+          </div>
+
+          {/* Send Email Checkbox */}
+          <div className="flex items-center gap-3 animate-slide-up" style={{ animationDelay: '0.22s' }}>
+            <Checkbox
+              id="send-email"
+              checked={sendEmail}
+              onCheckedChange={(checked) => setSendEmail(checked === true)}
+            />
+            <label
+              htmlFor="send-email"
+              className="text-sm font-medium text-foreground cursor-pointer"
+            >
+              Send results to my email ({currentUser?.email})
+            </label>
           </div>
 
           {/* Submit Button */}
