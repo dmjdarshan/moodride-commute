@@ -88,8 +88,8 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
       
       {isOpen && filteredLocations.length > 0 && (
         <div 
-          className="absolute z-[100] w-full mt-2 border border-border rounded-xl shadow-xl overflow-hidden"
-          style={{ backgroundColor: 'white' }}
+          className="absolute z-[100] w-full mt-2 border border-border rounded-xl shadow-xl overflow-hidden isolate opacity-100 backdrop-blur-none"
+          style={{ backgroundColor: '#ffffff', opacity: 1 }}
         >
           {filteredLocations.map((location, index) => (
             <button
@@ -97,15 +97,15 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
               type="button"
               onClick={() => handleSelect(location)}
               className={cn(
-                "w-full px-4 py-3 text-left flex items-center gap-3 transition-colors",
-                index !== filteredLocations.length - 1 && "border-b border-border/50"
+                "w-full px-4 py-3 text-left flex items-center gap-3 transition-colors opacity-100",
+                index !== filteredLocations.length - 1 && "border-b border-gray-200"
               )}
-              style={{ backgroundColor: 'white' }}
+              style={{ backgroundColor: '#ffffff', opacity: 1 }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ffffff'}
             >
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span className="text-foreground">{location}</span>
+              <MapPin className="h-4 w-4 text-gray-500" />
+              <span className="text-gray-900">{location}</span>
             </button>
           ))}
         </div>
