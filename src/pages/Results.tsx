@@ -50,7 +50,7 @@ const Results: React.FC = () => {
   const [isOffline, setIsOffline] = useState(false);
   const [selectedAlternative, setSelectedAlternative] = useState<number | null>(null);
 
-  const { source, destination, preferredMode, priority, extraNotes, persona } = location.state || {};
+  const { source, destination, apiResponse } = location.state || {};
 
   useEffect(() => {
     if (!source || !destination) {
@@ -58,35 +58,22 @@ const Results: React.FC = () => {
       return;
     }
 
-    const fetchResults = async () => {
-      try {
-        const response = await fetch('https://your-make-webhook-url.com/decide-commute', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: 'user@example.com',
-            persona,
-            source,
-            destination,
-            preferredMode,
-            priority,
-            extraNotes,
-            timestamp: new Date().toISOString()
-          })
-        });
-        
-        if (!response.ok) throw new Error('API failed');
-        const result = await response.json();
-        setData(result);
-      } catch (error) {
-        console.log('Using offline mode');
+    // Use API response if available, otherwise use dummy data
+    if (apiResponse) {
+      if (apiResponse.fallback || apiResponse.error) {
         setIsOffline(true);
-        setData(DUMMY_RESPONSE);
       }
-    };
-
-    fetchResults();
-  }, [source, destination, preferredMode, priority, extraNotes, persona, navigate]);
+      // Handle both direct response and nested structure
+      const responseData: ApiResponse = {
+        mvpOption: apiResponse.mvpOption || DUMMY_RESPONSE.mvpOption,
+        alternatives: apiResponse.alternatives || DUMMY_RESPONSE.alternatives
+      };
+      setData(responseData);
+    } else {
+      setIsOffline(true);
+      setData(DUMMY_RESPONSE);
+    }
+  }, [source, destination, apiResponse, navigate]);
 
   const getStressIndicator = (level: string) => {
     const levels = {

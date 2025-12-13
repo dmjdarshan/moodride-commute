@@ -1,0 +1,4 @@
+project_id = "gdqhwfsfiihgepopcpvv"
+
+[functions.decide-commute]
+verify_jwt = false
