@@ -30,26 +30,19 @@ interface AppContextType {
 }
 
 const BANGALORE_LOCATIONS = [
+  "Jayanagar",
   "Koramangala",
   "Indiranagar",
-  "Whitefield",
-  "HSR Layout",
-  "Marathahalli",
-  "Electronic City",
   "MG Road",
-  "Jayanagar",
-  "Bellandur",
-  "Sarjapur Road",
-  "ORR (Outer Ring Road)",
-  "Hebbal",
-  "Yeshwanthpur",
+  "Whitefield",
+  "Manyata Tech Park",
+  "Church Street",
+  "Polaris School of Technology",
+  "HSR Layout",
   "BTM Layout",
-  "JP Nagar",
-  "Silk Board",
-  "Bannerghatta Road",
-  "Yelahanka",
-  "KR Puram",
-  "Malleshwaram"
+  "Rajajinagar",
+  "Malleshwaram",
+  "Electronic City"
 ];
 
 const INITIAL_USERS: User[] = [
