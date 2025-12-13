@@ -87,7 +87,7 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
       </div>
       
       {isOpen && filteredLocations.length > 0 && (
-        <div className="absolute z-50 w-full mt-2 bg-card border border-border rounded-xl shadow-card overflow-hidden animate-scale-in opacity-100">
+        <div className="absolute z-50 w-full mt-2 bg-popover border border-border rounded-xl shadow-lg overflow-hidden">
           {filteredLocations.map((location, index) => (
             <button
               key={location}
