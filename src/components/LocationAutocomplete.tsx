@@ -87,16 +87,22 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
       </div>
       
       {isOpen && filteredLocations.length > 0 && (
-        <div className="absolute z-[100] w-full mt-2 bg-card border border-border rounded-xl shadow-xl overflow-hidden" style={{ backgroundColor: 'hsl(var(--card))' }}>
+        <div 
+          className="absolute z-[100] w-full mt-2 border border-border rounded-xl shadow-xl overflow-hidden"
+          style={{ backgroundColor: 'white' }}
+        >
           {filteredLocations.map((location, index) => (
             <button
               key={location}
               type="button"
               onClick={() => handleSelect(location)}
               className={cn(
-                "w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-accent/10 transition-colors",
+                "w-full px-4 py-3 text-left flex items-center gap-3 transition-colors",
                 index !== filteredLocations.length - 1 && "border-b border-border/50"
               )}
+              style={{ backgroundColor: 'white' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
             >
               <MapPin className="h-4 w-4 text-muted-foreground" />
               <span className="text-foreground">{location}</span>
