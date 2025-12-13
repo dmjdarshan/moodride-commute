@@ -326,7 +326,7 @@ const Results: React.FC = () => {
         {/* Plan another */}
         <Button
           variant="glass"
-          size="lg"
+          size="xl"
           className="w-full animate-slide-up"
           style={{ animationDelay: '0.4s' }}
           onClick={() => navigate('/home')}
