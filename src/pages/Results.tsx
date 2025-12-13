@@ -76,25 +76,44 @@ const Results: React.FC = () => {
 
     // Parse the new API format: { output: [{ mode, time, cost, reasoning, stress, mvp }] }
     const parseApiResponse = (response: any): ApiResponse => {
+      console.log('Raw API response:', JSON.stringify(response));
+      
+      let items: ApiOutputItem[] = [];
+      
+      // Try to extract the output array from various possible structures
       if (response.output && Array.isArray(response.output)) {
-        const items: ApiOutputItem[] = response.output;
+        items = response.output;
+      } else if (Array.isArray(response)) {
+        items = response;
+      } else if (typeof response === 'string') {
+        try {
+          const parsed = JSON.parse(response);
+          items = parsed.output || parsed;
+        } catch (e) {
+          console.error('Failed to parse response string:', e);
+        }
+      }
+      
+      console.log('Parsed items:', items);
+      
+      if (items.length > 0) {
         const mvpItem = items.find(item => item.mvp === true) || items[0];
         const alternativeItems = items.filter(item => item !== mvpItem);
 
         return {
           mvpOption: {
-            mode: mvpItem.mode,
-            time: mvpItem.time,
-            cost: mvpItem.cost,
-            reasoning: mvpItem.reasoning,
-            stressLevel: getStressLevelFromNumber(mvpItem.stress)
+            mode: mvpItem.mode || 'Unknown',
+            time: mvpItem.time || 'N/A',
+            cost: mvpItem.cost || 'N/A',
+            reasoning: mvpItem.reasoning || '',
+            stressLevel: getStressLevelFromNumber(mvpItem.stress || 5)
           },
           alternatives: alternativeItems.map(item => ({
-            mode: item.mode,
-            time: item.time,
-            cost: item.cost,
-            reasoning: item.reasoning,
-            stressLevel: getStressLevelFromNumber(item.stress)
+            mode: item.mode || 'Unknown',
+            time: item.time || 'N/A',
+            cost: item.cost || 'N/A',
+            reasoning: item.reasoning || '',
+            stressLevel: getStressLevelFromNumber(item.stress || 5)
           }))
         };
       }
