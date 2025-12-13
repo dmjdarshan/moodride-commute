@@ -40,23 +40,39 @@ const Onboarding: React.FC = () => {
   };
 
   const handleNext = () => {
-    // Skip car/bike preference steps if not owned
+    // Skip car/bike preference steps if not owned, skip preferred mode if only 1 asset
     let nextStep = currentStep + 1;
     if (currentStep === 1) {
       if (!commuteAssets.includes('car')) {
-        nextStep = commuteAssets.includes('bike') ? 3 : 4;
+        nextStep = commuteAssets.includes('bike') ? 3 : 5;
       }
     } else if (currentStep === 2 && !commuteAssets.includes('bike')) {
-      nextStep = 4;
+      nextStep = commuteAssets.length > 1 ? 4 : 5;
+    } else if (currentStep === 3) {
+      // After bike preference, go to preferred mode only if >1 asset
+      nextStep = commuteAssets.length > 1 ? 4 : 5;
     }
     setCurrentStep(Math.min(nextStep, TOTAL_STEPS));
   };
 
   const handleBack = () => {
     let prevStep = currentStep - 1;
-    if (currentStep === 4) {
-      if (!commuteAssets.includes('bike')) {
-        prevStep = commuteAssets.includes('car') ? 2 : 1;
+    if (currentStep === 5) {
+      // Going back from budget step
+      if (commuteAssets.length > 1) {
+        prevStep = 4; // Go to preferred mode
+      } else if (commuteAssets.includes('bike')) {
+        prevStep = 3;
+      } else if (commuteAssets.includes('car')) {
+        prevStep = 2;
+      } else {
+        prevStep = 1;
+      }
+    } else if (currentStep === 4) {
+      if (commuteAssets.includes('bike')) {
+        prevStep = 3;
+      } else {
+        prevStep = 2;
       }
     } else if (currentStep === 3 && !commuteAssets.includes('car')) {
       prevStep = 1;
@@ -72,11 +88,14 @@ const Onboarding: React.FC = () => {
   };
 
   const handleComplete = () => {
+    // If only one asset, set that as preferred mode automatically
+    const finalPreferredMode = commuteAssets.length === 1 ? commuteAssets[0] : preferredMode;
+    
     const persona: Persona = {
       commuteAssets,
       likesDrivingCar: likesDrivingCar >= 2,
       likesRidingBike: likesRidingBike >= 2,
-      preferredMode,
+      preferredMode: finalPreferredMode,
       budgetVsConvenience: budgetVsConvenience[0],
       ontimePreference: ontimePreference[0],
       gmapsConnected

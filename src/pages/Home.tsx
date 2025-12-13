@@ -56,13 +56,17 @@ const Home: React.FC = () => {
 
   const getModeOptions = () => {
     const options: { value: TransportMode; icon: React.ReactNode; label: string; color: string }[] = [];
+    const userAssets = currentUser?.persona?.commuteAssets || [];
     
-    if (currentUser?.persona?.commuteAssets.includes('bike')) {
+    // Add user's owned assets first
+    if (userAssets.includes('bike')) {
       options.push({ value: 'bike', icon: <span className="text-xl">🏍️</span>, label: 'Bike', color: 'bike' });
     }
-    if (currentUser?.persona?.commuteAssets.includes('car')) {
+    if (userAssets.includes('car')) {
       options.push({ value: 'car', icon: <span className="text-xl">🚗</span>, label: 'Car', color: 'primary' });
     }
+    
+    // Always show metro, cab and any options
     options.push(
       { value: 'metro', icon: <span className="text-xl">🚇</span>, label: 'Metro', color: 'metro' },
       { value: 'cab', icon: <span className="text-xl">🚕</span>, label: 'Cab/Auto', color: 'auto' },
