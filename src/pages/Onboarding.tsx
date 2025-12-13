@@ -100,9 +100,15 @@ const Onboarding: React.FC = () => {
       ontimePreference: ontimePreference[0],
       gmapsConnected
     };
+    
+    // Update persona first, then complete onboarding synchronously
     updatePersona(persona);
-    completeOnboarding();
-    navigate('/home');
+    
+    // Use setTimeout to ensure state is updated before completing onboarding
+    setTimeout(() => {
+      completeOnboarding();
+      navigate('/home');
+    }, 0);
   };
 
   const canProceed = () => {

@@ -110,15 +110,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     
     const updatedUser = { ...currentUser, persona };
     setCurrentUser(updatedUser);
-    setUsers(users.map(u => u.email === currentUser.email ? updatedUser : u));
+    setUsers(prev => prev.map(u => u.email === currentUser.email ? updatedUser : u));
   };
 
   const completeOnboarding = () => {
     if (!currentUser) return;
     
-    const updatedUser = { ...currentUser, onboardingComplete: true };
-    setCurrentUser(updatedUser);
-    setUsers(users.map(u => u.email === currentUser.email ? updatedUser : u));
+    // Use functional update to ensure we get the latest state
+    setCurrentUser(prev => {
+      if (!prev) return prev;
+      const updatedUser = { ...prev, onboardingComplete: true };
+      setUsers(users => users.map(u => u.email === prev.email ? updatedUser : u));
+      return updatedUser;
+    });
   };
 
   return (
