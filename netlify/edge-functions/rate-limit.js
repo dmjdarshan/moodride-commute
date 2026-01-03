@@ -1,17 +1,28 @@
+// netlify/edge-functions/rate-limit.js
+
+let rateMap = new Map(); // simple in-memory store
+
 export default async (request, context) => {
   const ip = request.headers.get("x-forwarded-for") || "unknown";
-  const key = `rate:${ip}`;
-  const limit = 60;       // max requests
-  const windowSeconds = 60;
+  const now = Date.now();
+  const windowMs = 60_000; // 1 minute
+  const limit = 60;
 
-  // read current count from edge kv (or in-memory for demo)
-  const count = (await context.geo?.get(key)) || 0;
+  const entry = rateMap.get(ip) || { count: 0, time: now };
 
-  if (count >= limit) {
+  // reset window if expired
+  if (now - entry.time > windowMs) {
+    entry.count = 0;
+    entry.time = now;
+  }
+
+  entry.count += 1;
+  rateMap.set(ip, entry);
+
+  if (entry.count > limit) {
     return new Response("Too Many Requests", { status: 429 });
   }
 
-  await context.geo?.set(key, count + 1, { ttl: windowSeconds });
-
-  return context.next(); // continue to site
+  // continue to serve site
+  return context.next();
 };
