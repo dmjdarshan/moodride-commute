@@ -3,3 +3,7 @@ for = "/*"
   [headers.values]
   X-RateLimit-Limit = "60"
   X-RateLimit-Window = "60"
+
+[[edge_functions]]
+function = "rate-limit"
+path = "/*"
